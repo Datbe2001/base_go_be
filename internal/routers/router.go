@@ -1,25 +1,15 @@
 package routers
 
 import (
+	"base_go_be/internal/controller"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func InitRouter() *gin.Engine {
 	r := gin.Default()
 	v1 := r.Group("/api/v1")
 	{
-		v1.GET("/ping", Pong)
+		v1.GET("/get_me/:name", controller.NewUserController().GetMe)
 	}
 	return r
-}
-
-func Pong(c *gin.Context) {
-	name := c.DefaultQuery("name", "dat")
-	uid := c.Query("uid")
-	c.JSON(http.StatusOK, gin.H{
-		"message":   "pong...." + name,
-		"uid":       uid,
-		"list_user": []string{uid, name},
-	})
 }
