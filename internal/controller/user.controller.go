@@ -2,8 +2,8 @@ package controller
 
 import (
 	"base_go_be/internal/service"
+	"base_go_be/pkg/response"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type UserController struct {
@@ -20,8 +20,7 @@ func (uc *UserController) GetMe(c *gin.Context) {
 	name := c.Param("name")
 	//uid := c.Query("uid")
 	result := uc.userService.GetMe(name)
-	c.JSON(http.StatusOK, gin.H{
-		"name": result,
-	})
+	response.SuccessResponse(c, 2001, result)
+	response.FailResponse(c, 2002)
 
 }

@@ -1,0 +1,14 @@
+server:
+  port: 8082
+databases:
+  - user: admin
+    password: admin
+    host: localhost
+    dbName: BaseGo
+  - user: order
+    password: admin
+    host: localhost
+    dbName: Order
+security:
+  jwt:
+    secretKey: 123

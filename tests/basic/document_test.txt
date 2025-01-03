@@ -1,0 +1,3 @@
+- active test: run go mod tidy -e
+- create coverage: run (cd tests/basic/ && go test -coverprofile=coverage.out)
+- create coverage html: run (cd tests/basic/ && go tool cover -html=coverage.out -o coverage.html)
