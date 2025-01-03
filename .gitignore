@@ -1,4 +1,4 @@
 .idea/
-log
+log/log.txt
 go.sum
 ./config/production.yaml
