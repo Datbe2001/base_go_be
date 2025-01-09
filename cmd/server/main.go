@@ -1,13 +1,7 @@
 package main
 
-import (
-	"base_go_be/internal/routers"
-)
+import "base_go_be/internal/initialize"
 
 func main() {
-	r := routers.InitRouter()
-	err := r.Run(":8080")
-	if err != nil {
-		return
-	}
+	initialize.Run()
 }
