@@ -20,7 +20,7 @@ mysql:
   port: 33306
   username: admin
   password: 123123
-  dbname: go_be
+  dbname: go_database
   maxIdleConn: 10
   maxOpenConn: 100
   connMaxLifetime: 3600

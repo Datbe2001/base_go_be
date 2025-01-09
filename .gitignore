@@ -1,4 +1,6 @@
 .idea/
 log/log.txt
+storages
 go.sum
+tests
 ./config/production.yaml
