@@ -1,17 +1,38 @@
 package initialize
 
 import (
-	"base_go_be/internal/controller"
-	"base_go_be/internal/middlewares"
+	"base_go_be/global"
+	"base_go_be/internal/routers"
 	"github.com/gin-gonic/gin"
 )
 
 func InitRouter() *gin.Engine {
-	r := gin.Default()
-	r.Use(middlewares.AuthMiddleware())
-	v1 := r.Group("/api/v1")
+	var r *gin.Engine
+	if global.Config.Server.Mode == "dev" {
+		gin.SetMode(gin.DebugMode)
+		gin.DisableConsoleColor()
+		r = gin.Default()
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+		r = gin.New()
+	}
+
+	//middleware
+	//r.Use() //logging
+	//r.Use() // cross
+	//r.Use() // limiter global
+
+	managerRouter := routers.RouterGroupApp.Manager
+	userRouter := routers.RouterGroupApp.User
+	MainGroup := r.Group("/v1")
 	{
-		v1.GET("/get_me/:name", controller.NewUserController().GetMe)
+		userRouter.InitUserRouter(MainGroup)
+		userRouter.InitProductRouter(MainGroup)
+	}
+	{
+		managerRouter.InitUserRouter(MainGroup)
+		managerRouter.InitAdminRouter(MainGroup)
+
 	}
 	return r
 }

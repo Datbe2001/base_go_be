@@ -7,20 +7,16 @@ import (
 )
 
 type UserController struct {
-	userService *service.UserService
+	userService service.IUserService
 }
 
-func NewUserController() *UserController {
+func NewUserController(userService service.IUserService) *UserController {
 	return &UserController{
-		userService: service.NewUserService(),
+		userService: userService,
 	}
 }
 
-func (uc *UserController) GetMe(c *gin.Context) {
-	name := c.Param("name")
-	//uid := c.Query("uid")
-	result := uc.userService.GetMe(name)
-	response.SuccessResponse(c, 2001, result)
-	response.FailResponse(c, 2002)
-
+func (uc *UserController) Register(c *gin.Context) {
+	result := uc.userService.Register("", "")
+	response.SuccessResponse(c, result, nil)
 }
