@@ -2,7 +2,7 @@ package initialize
 
 import (
 	"base_go_be/global"
-	"base_go_be/internal/po"
+	"base_go_be/internal/model"
 	"fmt"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
@@ -34,6 +34,7 @@ func Mysql() {
 	global.Logger.Info("Mysql connect successfully!")
 	setPool()
 	migrateTables()
+	//RemoveEmailColumn()
 }
 
 func setPool() {
@@ -46,7 +47,12 @@ func setPool() {
 }
 
 func migrateTables() {
-	err := global.Mysql.AutoMigrate(&po.User{}, &po.Role{})
+	//err := global.Mysql.AutoMigrate(&po.User{}, &po.Role{})
+	err := global.Mysql.AutoMigrate(&model.User{}, &model.Product{})
 	checkErrPanic(err, "AutoMigrate MySQL database failed")
 
 }
+
+//func RemoveEmailColumn() {
+//	checkErrPanic(global.Mysql.Migrator().DropColumn(&po.User{}, "email"), "Remove email column")
+//}

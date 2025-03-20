@@ -1,0 +1,10 @@
+# curl  http://localhost:8001/v1/user/test
+GET http://localhost:8001/v1/user/test
+
+### local
+
+
+# curl  http://localhost:8002/v1/user/test
+GET http://localhost:8002/v1/user/test
+
+### docker

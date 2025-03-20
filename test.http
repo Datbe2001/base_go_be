@@ -1,0 +1,7 @@
+###
+
+# curl  http://localhost:8386/v1/user/test
+GET http://localhost:8386/v1/user/test
+
+###
+
