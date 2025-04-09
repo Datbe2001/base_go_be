@@ -26,3 +26,14 @@ func FailResponse(c *gin.Context, code int) {
 		Data:    nil,
 	})
 }
+
+func ErrResponse(c *gin.Context, code int, messages string) {
+	c.JSON(http.StatusOK, Response{
+		Code:    code,
+		Message: messages,
+	})
+}
+
+func DataResponse(c *gin.Context, data interface{}) {
+	c.JSON(http.StatusOK, data)
+}

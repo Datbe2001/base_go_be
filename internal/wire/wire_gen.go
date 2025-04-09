@@ -14,7 +14,7 @@ import (
 
 // Injectors from user.wire.go:
 
-func InitUserRouterHanlder() (*controller.UserController, error) {
+func InitUserRouterHandler() (*controller.UserController, error) {
 	iUserRepository := repo.NewUserRepository()
 	iUserService := service.NewUserService(iUserRepository)
 	userController := controller.NewUserController(iUserService)

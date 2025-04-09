@@ -13,14 +13,15 @@ func (pr *UsersRouter) InitUserRouter(Router *gin.RouterGroup) {
 	//ur := repo.NewUserRepository()
 	//us := service.NewUserService(ur)
 	//userHandlerNonDependency := controller.NewUserController(us)
-	userController, _ := wire.InitUserRouterHanlder()
+	userController, _ := wire.InitUserRouterHandler()
 
 	// WIRE go
 	// Dependency Injection (DI) DI java
 	usersRouterPublic := Router.Group("/user")
 	{
 		usersRouterPublic.GET("/register")
-		usersRouterPublic.GET("/test", userController.Register)
+		usersRouterPublic.GET("/test/:id", userController.GetUserByID)
+		usersRouterPublic.POST("/create_user", userController.CreateUser)
 		usersRouterPublic.POST("/login")
 	}
 
