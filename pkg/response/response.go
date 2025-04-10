@@ -11,29 +11,18 @@ type Response struct {
 	Data    interface{} `json:"data"`
 }
 
-func SuccessResponse(c *gin.Context, code int, data interface{}) {
-	c.JSON(http.StatusOK, Response{
+func DataDetailResponse(c *gin.Context, statusCode int, code int, data interface{}) {
+	c.JSON(statusCode, Response{
 		Code:    code,
 		Message: msg[code],
 		Data:    data,
 	})
 }
 
-func FailResponse(c *gin.Context, code int) {
-	c.JSON(http.StatusOK, Response{
-		Code:    code,
-		Message: msg[code],
-		Data:    nil,
-	})
-}
-
-func ErrResponse(c *gin.Context, code int, messages string) {
-	c.JSON(http.StatusOK, Response{
-		Code:    code,
-		Message: messages,
-	})
-}
-
-func DataResponse(c *gin.Context, data interface{}) {
+func SuccessResponse(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, data)
+}
+
+func ErrorResponse(c *gin.Context, statusCode int, data interface{}) {
+	c.JSON(statusCode, data)
 }

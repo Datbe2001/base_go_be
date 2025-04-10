@@ -24,12 +24,12 @@ type MySQLSetting struct {
 }
 
 type LoggerSetting struct {
-	Log_level     string `map_structure:"log_level"`
-	File_log_name string `map_structure:"file_log_name"`
-	Max_backups   int    `map_structure:"max_backups"`
-	Max_size      int    `map_structure:"max_size"`
-	Max_age       int    `map_structure:"max_age"`
-	Compress      bool   `map_structure:"compress"`
+	LogLevel    string `map_structure:"log_level"`
+	FileLogName string `map_structure:"file_log_name"`
+	MaxBackups  int    `map_structure:"max_backups"`
+	MaxSize     int    `map_structure:"max_size"`
+	MaxAge      int    `map_structure:"max_age"`
+	Compress    bool   `map_structure:"compress"`
 }
 
 type RedisSetting struct {
