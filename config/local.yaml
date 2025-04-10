@@ -17,8 +17,8 @@ server:
   port: 8082
   mode: "dev"
 mysql:
-  host: mysql #127.0.0.1
-  port: 3306 #33306
+  host: 127.0.0.1 #mysql
+  port: 33306 #3306
   username: admin #admin
   password: 123123
   dbname: go_database

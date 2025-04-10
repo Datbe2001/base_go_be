@@ -5,6 +5,12 @@ GET http://localhost:8001/v1/user/test
 
 
 # curl  http://localhost:8002/v1/user/test
-GET http://localhost:8386/v1/user/test/2
+GET http://localhost:8386/v1/user/test/1
+
+### docker
+
+
+# curl  http://localhost:8002/v1/user/list_user
+GET http://localhost:8386/v1/user/list_user
 
 ### docker

@@ -21,6 +21,7 @@ func (pr *UsersRouter) InitUserRouter(Router *gin.RouterGroup) {
 	{
 		usersRouterPublic.GET("/register")
 		usersRouterPublic.GET("/test/:id", userController.GetUserByID)
+		usersRouterPublic.GET("/list_user", userController.GetListUser)
 		usersRouterPublic.POST("/create_user", userController.CreateUser)
 		usersRouterPublic.POST("/login")
 	}

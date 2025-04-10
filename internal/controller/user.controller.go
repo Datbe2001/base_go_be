@@ -20,7 +20,8 @@ func NewUserController(userService service.IUserService) *UserController {
 
 func (uc *UserController) GetUserByID(c *gin.Context) {
 	idParam := c.Param("id")
-	id, err := strconv.Atoi(idParam)
+	idUint64, err := strconv.ParseUint(idParam, 10, 0)
+	id := uint(idUint64)
 	if err != nil {
 		response.DataDetailResponse(c, 422, response.ErrCodeInvalidParams, nil)
 		return
@@ -28,6 +29,11 @@ func (uc *UserController) GetUserByID(c *gin.Context) {
 
 	user := uc.userService.GetUserByID(id)
 	response.SuccessResponse(c, user)
+}
+
+func (uc *UserController) GetListUser(c *gin.Context) {
+	users := uc.userService.GetListUser()
+	response.SuccessResponse(c, users)
 }
 
 func (uc *UserController) CreateUser(c *gin.Context) {
@@ -40,7 +46,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 
 	userID, err := uc.userService.CreateUser(userRequest.Email, userRequest.Username, userRequest.Role)
 	if err != nil {
-		response.ErrorResponse(c, 500, err.Error())
+		response.ErrorResponse(c, 405, err.Error())
 		return
 	}
 
