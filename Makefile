@@ -7,5 +7,5 @@ run:
 mysql:
 	docker restart mysql
 
-sudo_docker:
-	sudo usermod -aG docker $USER
+swag:
+	swag init -g ./cmd/${APP_NAME}/main.go -o docs

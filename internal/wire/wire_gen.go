@@ -12,6 +12,15 @@ import (
 	"base_go_be/internal/service"
 )
 
+// Injectors from product.wire.go:
+
+func InitProductRouterHandler() (*controller.ProductController, error) {
+	iProductRepository := repo.NewProductRepository()
+	iProductService := service.NewProductService(iProductRepository)
+	productController := controller.NewProductController(iProductService)
+	return productController, nil
+}
+
 // Injectors from user.wire.go:
 
 func InitUserRouterHandler() (*controller.UserController, error) {

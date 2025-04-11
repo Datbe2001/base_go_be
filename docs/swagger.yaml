@@ -1,0 +1,123 @@
+basePath: /v1
+definitions:
+  dto.ProductDetailDto:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  dto.ProductRequestDto:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      userID:
+        type: integer
+    type: object
+  dto.ProductResponseDto:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserResponseDto'
+      userID:
+        type: integer
+    type: object
+  dto.UserResponseDto:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      role:
+        type: string
+      username:
+        type: string
+    required:
+    - id
+    type: object
+info:
+  contact:
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server Go API server.
+  termsOfService: http://swagger.io/terms/
+  title: Go API
+  version: "1.0"
+paths:
+  /product/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new product with name, description, and user ID
+      parameters:
+      - description: Product Request
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProductRequestDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+      tags:
+      - Product
+  /product/detail/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get product details by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProductDetailDto'
+      tags:
+      - Product
+  /product/list:
+    get:
+      consumes:
+      - application/json
+      description: Get all products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.ProductResponseDto'
+            type: array
+      tags:
+      - Product
+swagger: "2.0"

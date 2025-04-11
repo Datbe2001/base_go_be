@@ -14,3 +14,17 @@ GET http://localhost:8386/v1/user/test/1
 GET http://localhost:8386/v1/user/list_user
 
 ### docker
+
+
+# http://localhost:8386/v1/product/detail/2
+GET http://localhost:8386/v1/product/detail/2
+
+### docker
+
+
+# http://localhost:8386/v1/product/list
+GET http://localhost:8386/v1/product/list
+
+### docker
+
+http://localhost:8386/product/detail/2

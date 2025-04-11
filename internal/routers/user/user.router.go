@@ -19,11 +19,11 @@ func (pr *UsersRouter) InitUserRouter(Router *gin.RouterGroup) {
 	// Dependency Injection (DI) DI java
 	usersRouterPublic := Router.Group("/user")
 	{
+		usersRouterPublic.POST("/login")
 		usersRouterPublic.GET("/register")
-		usersRouterPublic.GET("/test/:id", userController.GetUserByID)
+		usersRouterPublic.GET("/get_user/:id", userController.GetUserByID)
 		usersRouterPublic.GET("/list_user", userController.GetListUser)
 		usersRouterPublic.POST("/create_user", userController.CreateUser)
-		usersRouterPublic.POST("/login")
 	}
 
 	//private router
