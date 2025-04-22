@@ -2,6 +2,7 @@ package user
 
 import (
 	"base_go_be/internal/wire"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,7 +21,7 @@ func (pr *UsersRouter) InitUserRouter(Router *gin.RouterGroup) {
 	usersRouterPublic := Router.Group("/user")
 	{
 		usersRouterPublic.POST("/login")
-		usersRouterPublic.GET("/register")
+		usersRouterPublic.GET("/register", userController.Register)
 		usersRouterPublic.GET("/get_user/:id", userController.GetUserByID)
 		usersRouterPublic.GET("/list_user", userController.GetListUser)
 		usersRouterPublic.POST("/create_user", userController.CreateUser)

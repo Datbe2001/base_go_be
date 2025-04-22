@@ -52,6 +52,14 @@ definitions:
     required:
     - id
     type: object
+  response.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+    type: object
 info:
   contact:
     name: API Support
@@ -120,4 +128,81 @@ paths:
             type: array
       tags:
       - Product
+  /user/get_user/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserResponseDto'
+              type: object
+        "422":
+          description: Invalid user ID
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get user by ID
+      tags:
+      - user
+  /user/list_user:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of users
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.UserResponseDto'
+                  type: array
+              type: object
+      summary: Get all users
+      tags:
+      - user
+  /user/register:
+    get:
+      consumes:
+      - application/json
+      description: Starts a long-running task in the background and returns immediately
+      parameters:
+      - description: Data to process in the background
+        in: query
+        name: data
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Background task started
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Missing data parameter
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Run a task in the background
+      tags:
+      - user
 swagger: "2.0"
