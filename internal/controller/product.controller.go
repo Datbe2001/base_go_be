@@ -18,13 +18,18 @@ func NewProductController(productService service.IProductService) *ProductContro
 	}
 }
 
-// GetProductByID @Summary Get product by ID
+// GetProductByID godoc
+// @Summary Get product by ID
 // @Description Get product details by ID
-// @Tags Product
+// @Tags product
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path int true "Product ID"
-// @Success 200 {object} dto.ProductDetailDto
+// @Success 200 {object} response.Response{data=dto.ProductDetailDto}
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 404 {object} response.Response "Product not found"
+// @Failure 422 {object} response.Response "Invalid product ID"
 // @Router /product/detail/{id} [get]
 func (pc *ProductController) GetProductByID(c *gin.Context) {
 	idParam := c.Param("id")
@@ -43,12 +48,16 @@ func (pc *ProductController) GetProductByID(c *gin.Context) {
 	response.SuccessResponse(c, product)
 }
 
-// GetListProduct @Summary Get list of products
+// GetListProduct godoc
+// @Summary Get list of products
 // @Description Get all products
-// @Tags Product
+// @Tags product
 // @Accept json
 // @Produce json
-// @Success 200 {array} dto.ProductResponseDto
+// @Security ApiKeyAuth
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Success 200 {object} response.Response{data=[]dto.ProductResponseDto}
+// @Failure 500 {object} response.Response "Internal server error"
 // @Router /product/list [get]
 func (pc *ProductController) GetListProduct(c *gin.Context) {
 	products, err := pc.productService.GetListProduct()
@@ -59,13 +68,18 @@ func (pc *ProductController) GetListProduct(c *gin.Context) {
 	response.SuccessResponse(c, products)
 }
 
-// CreateProduct @Summary Create a new product
+// CreateProduct godoc
+// @Summary Create a new product
 // @Description Create a new product with name, description, and user ID
-// @Tags Product
+// @Tags product
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param product body dto.ProductRequestDto true "Product Request"
-// @Success 200 {object} map[string]uint
+// @Success 200 {object} response.Response{data=map[string]uint}
+// @Failure 400 {object} response.Response "Invalid request payload"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 405 {object} response.Response "Method not allowed"
 // @Router /product/create [post]
 func (pc *ProductController) CreateProduct(c *gin.Context) {
 	productRequest := dto.ProductRequestDto{}
@@ -75,7 +89,14 @@ func (pc *ProductController) CreateProduct(c *gin.Context) {
 		return
 	}
 
-	productID, err := pc.productService.CreateProduct(productRequest.Name, productRequest.Description, productRequest.UserID)
+	// Get user ID from JWT token context instead of request
+	userID, exists := c.Get("userID")
+	if !exists {
+		response.ErrorResponse(c, 401, "Unauthorized")
+		return
+	}
+
+	productID, err := pc.productService.CreateProduct(productRequest.Name, productRequest.Description, userID.(uint))
 	if err != nil {
 		response.ErrorResponse(c, 405, err.Error())
 		return

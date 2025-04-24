@@ -6,24 +6,24 @@ import (
 
 type ProductRequestDto struct {
 	UserID      uint   `gorm:"not null"`
-	Name        string `gorm:"type:varchar(255);not null"`
-	Description string `gorm:"type:text"`
+	Name        string `json:"name" binding:"required" gorm:"type:varchar(255);not null"`
+	Description string `json:"description" gorm:"type:text"`
 }
 
 type ProductDetailDto struct {
-	ID          uint      `gorm:"primaryKey;autoIncrement"`
-	Name        string    `gorm:"type:varchar(255);not null"`
-	Description string    `gorm:"type:text"`
-	CreatedAt   time.Time `gorm:"autoCreateTime"`
-	UpdatedAt   time.Time `gorm:"autoUpdateTime"`
+	ID          uint      `json:"id" gorm:"primaryKey;autoIncrement"`
+	Name        string    `json:"name" gorm:"type:varchar(255);not null"`
+	Description string    `json:"description" gorm:"type:text"`
+	CreatedAt   time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt   time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }
 
 type ProductResponseDto struct {
-	ID          uint            `gorm:"primaryKey;autoIncrement"`
-	UserID      uint            `gorm:"not null"`
-	User        UserResponseDto `gorm:"foreignKey:UserID"`
-	Name        string          `gorm:"type:varchar(255);not null"`
-	Description string          `gorm:"type:text"`
-	CreatedAt   time.Time       `gorm:"autoCreateTime"`
-	UpdatedAt   time.Time       `gorm:"autoUpdateTime"`
+	ID          uint            `json:"id" gorm:"primaryKey;autoIncrement"`
+	UserID      uint            `json:"user_id" gorm:"not null"`
+	User        UserResponseDto `json:"user" gorm:"foreignKey:UserID"`
+	Name        string          `json:"name" gorm:"type:varchar(255);not null"`
+	Description string          `json:"description" gorm:"type:text"`
+	CreatedAt   time.Time       `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt   time.Time       `json:"updated_at" gorm:"autoUpdateTime"`
 }

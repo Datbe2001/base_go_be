@@ -87,7 +87,7 @@ This project uses Google Wire for dependency injection:
    ```
 
 ### API Documentation
-
+go install github.com/swaggo/swag/cmd/swag@latest
 Generate Swagger documentation:
 ```
 make swag

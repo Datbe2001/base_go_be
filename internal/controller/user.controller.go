@@ -28,24 +28,57 @@ func longRunningTask(data string) {
 }
 
 // Register godoc
-// @Summary Run a task in the background
-// @Description Starts a long-running task in the background and returns immediately
-// @Tags user
+// @Summary Register a new user
+// @Description Register a new user and return JWT token
+// @Tags auth
 // @Accept json
 // @Produce json
-// @Param data query string true "Data to process in the background"
-// @Success 200 {object} response.Response "Background task started"
-// @Failure 400 {object} response.Response "Missing data parameter"
-// @Router /user/register [get]
+// @Param user body dto.RegisterRequestDto true "User Registration Data"
+// @Success 200 {object} response.Response{data=dto.AuthResponseDto} "Registration successful"
+// @Failure 400 {object} response.Response "Invalid request data"
+// @Failure 422 {object} response.Response "User already exists"
+// @Router /user/register [post]
 func (uc *UserController) Register(c *gin.Context) {
-	data := c.Query("data")
-	if data == "" {
-		c.JSON(400, gin.H{"error": "Missing data"})
+	var registerRequest dto.RegisterRequestDto
+	if err := c.ShouldBindJSON(&registerRequest); err != nil {
+		response.ErrorResponse(c, 400, "Invalid request data")
 		return
 	}
 
-	go longRunningTask(data)
-	response.SuccessResponse(c, gin.H{"message": "🚀 Task đã được gửi xử lý background!"})
+	authResponse, err := uc.userService.Register(registerRequest)
+	if err != nil {
+		response.ErrorResponse(c, 422, err.Error())
+		return
+	}
+
+	response.SuccessResponse(c, authResponse)
+}
+
+// Login godoc
+// @Summary Login user
+// @Description Authenticate user and return JWT token
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param user body dto.LoginRequestDto true "User Login Data"
+// @Success 200 {object} response.Response{data=dto.AuthResponseDto} "Login successful"
+// @Failure 400 {object} response.Response "Invalid request data"
+// @Failure 401 {object} response.Response "Invalid credentials"
+// @Router /user/login [post]
+func (uc *UserController) Login(c *gin.Context) {
+	var loginRequest dto.LoginRequestDto
+	if err := c.ShouldBindJSON(&loginRequest); err != nil {
+		response.ErrorResponse(c, 400, "Invalid request data")
+		return
+	}
+
+	authResponse, err := uc.userService.Login(loginRequest.Email, loginRequest.Password)
+	if err != nil {
+		response.ErrorResponse(c, 401, "Invalid email or password")
+		return
+	}
+
+	response.SuccessResponse(c, authResponse)
 }
 
 // GetUserByID godoc
@@ -77,13 +110,29 @@ func (uc *UserController) GetUserByID(c *gin.Context) {
 // @Tags user
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Success 200 {object} response.Response{data=[]dto.UserResponseDto} "List of users"
+// @Failure 401 {object} response.Response "Unauthorized"
 // @Router /user/list_user [get]
 func (uc *UserController) GetListUser(c *gin.Context) {
 	users := uc.userService.GetListUser()
 	response.SuccessResponse(c, users)
 }
 
+// CreateUser godoc
+// @Summary Create a new user
+// @Description Creates a new user with the provided information
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param user body dto.UserRequestDto true "User Information"
+// @Success 200 {object} response.Response{data=map[string]interface{}} "User created successfully"
+// @Failure 400 {object} response.Response "Invalid request payload"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 403 {object} response.Response "Forbidden"
+// @Failure 405 {object} response.Response "User already exists"
+// @Router /user/create_user [post]
 func (uc *UserController) CreateUser(c *gin.Context) {
 	userRequest := dto.UserRequestDto{}
 
@@ -92,12 +141,32 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
-	userID, err := uc.userService.CreateUser(userRequest.Email, userRequest.Username, userRequest.Role)
+	userID, err := uc.userService.CreateUser(userRequest.Email, userRequest.Username, userRequest.Password, userRequest.Role)
 	if err != nil {
 		response.ErrorResponse(c, 405, err.Error())
 		return
 	}
 
 	response.SuccessResponse(c, gin.H{"user_id": userID})
+}
 
+// GetCurrentUser godoc
+// @Summary Get current user
+// @Description Get the currently logged in user's information
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} response.Response{data=dto.UserResponseDto} "Current user"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Router /user/me [get]
+func (uc *UserController) GetCurrentUser(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		response.ErrorResponse(c, 401, "Unauthorized")
+		return
+	}
+
+	user := uc.userService.GetUserByID(userID.(uint))
+	response.SuccessResponse(c, user)
 }

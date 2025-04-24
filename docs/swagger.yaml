@@ -1,8 +1,27 @@
 basePath: /v1
 definitions:
+  dto.AuthResponseDto:
+    properties:
+      refresh_token:
+        type: string
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserResponseDto'
+    type: object
+  dto.LoginRequestDto:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
   dto.ProductDetailDto:
     properties:
-      createdAt:
+      created_at:
         type: string
       description:
         type: string
@@ -10,7 +29,7 @@ definitions:
         type: integer
       name:
         type: string
-      updatedAt:
+      updated_at:
         type: string
     type: object
   dto.ProductRequestDto:
@@ -21,10 +40,12 @@ definitions:
         type: string
       userID:
         type: integer
+    required:
+    - name
     type: object
   dto.ProductResponseDto:
     properties:
-      createdAt:
+      created_at:
         type: string
       description:
         type: string
@@ -32,12 +53,49 @@ definitions:
         type: integer
       name:
         type: string
-      updatedAt:
+      updated_at:
         type: string
       user:
         $ref: '#/definitions/dto.UserResponseDto'
-      userID:
+      user_id:
         type: integer
+    type: object
+  dto.RegisterRequestDto:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      role:
+        enum:
+        - ADMIN
+        - USER
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - role
+    - username
+    type: object
+  dto.UserRequestDto:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - role
+    - username
     type: object
   dto.UserResponseDto:
     properties:
@@ -60,6 +118,7 @@ definitions:
       message:
         type: string
     type: object
+host: localhost:8386
 info:
   contact:
     name: API Support
@@ -87,11 +146,31 @@ paths:
         "200":
           description: OK
           schema:
-            additionalProperties:
-              type: integer
-            type: object
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  additionalProperties:
+                    type: integer
+                  type: object
+              type: object
+        "400":
+          description: Invalid request payload
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "405":
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new product
       tags:
-      - Product
+      - product
   /product/detail/{id}:
     get:
       consumes:
@@ -109,9 +188,29 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ProductDetailDto'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ProductDetailDto'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Product not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "422":
+          description: Invalid product ID
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get product by ID
       tags:
-      - Product
+      - product
   /product/list:
     get:
       consumes:
@@ -123,11 +222,73 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/dto.ProductResponseDto'
-            type: array
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.ProductResponseDto'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get list of products
       tags:
-      - Product
+      - product
+  /user/create_user:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user with the provided information
+      parameters:
+      - description: User Information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserRequestDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  additionalProperties: true
+                  type: object
+              type: object
+        "400":
+          description: Invalid request payload
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "405":
+          description: User already exists
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new user
+      tags:
+      - user
   /user/get_user/{id}:
     get:
       consumes:
@@ -177,32 +338,115 @@ paths:
                     $ref: '#/definitions/dto.UserResponseDto'
                   type: array
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Get all users
       tags:
       - user
-  /user/register:
-    get:
+  /user/login:
+    post:
       consumes:
       - application/json
-      description: Starts a long-running task in the background and returns immediately
+      description: Authenticate user and return JWT token
       parameters:
-      - description: Data to process in the background
-        in: query
-        name: data
+      - description: User Login Data
+        in: body
+        name: user
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/dto.LoginRequestDto'
       produces:
       - application/json
       responses:
         "200":
-          description: Background task started
+          description: Login successful
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AuthResponseDto'
+              type: object
         "400":
-          description: Missing data parameter
+          description: Invalid request data
           schema:
             $ref: '#/definitions/response.Response'
-      summary: Run a task in the background
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Login user
+      tags:
+      - auth
+  /user/me:
+    get:
+      consumes:
+      - application/json
+      description: Get the currently logged in user's information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Current user
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserResponseDto'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get current user
       tags:
       - user
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user and return JWT token
+      parameters:
+      - description: User Registration Data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterRequestDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Registration successful
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AuthResponseDto'
+              type: object
+        "400":
+          description: Invalid request data
+          schema:
+            $ref: '#/definitions/response.Response'
+        "422":
+          description: User already exists
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Register a new user
+      tags:
+      - auth
+securityDefinitions:
+  ApiKeyAuth:
+    description: 'JWT Authorization header using Bearer scheme. Example: "Bearer {token}"'
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
