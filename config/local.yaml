@@ -16,12 +16,13 @@
 server:
   port: 8082
   mode: "dev"
-mysql:
-  host: 127.0.0.1 #mysql
-  port: 33306 #3306
+postgres:
+  host: 127.0.0.1 #postgres
+  port: 5432
   username: admin #admin
   password: 123123
   dbname: go_database
+  sslmode: disable
   maxIdleConn: 10
   maxOpenConn: 100
   connMaxLifetime: 3600

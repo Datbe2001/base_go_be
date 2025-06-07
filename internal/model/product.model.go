@@ -1,17 +1,15 @@
 package model
 
-import (
-	"time"
-)
+import "time"
 
 type Product struct {
-	ID          uint      `gorm:"primaryKey;autoIncrement"`
-	UserID      uint      `gorm:"not null"`
-	User        User      `gorm:"foreignKey:UserID"`
-	Name        string    `gorm:"type:varchar(255);not null"`
-	Description string    `gorm:"type:text"`
-	CreatedAt   time.Time `gorm:"autoCreateTime"`
-	UpdatedAt   time.Time `gorm:"autoUpdateTime"`
+	ID          uint      `json:"id" db:"id"`
+	UserID      uint      `json:"user_id" db:"user_id"`
+	User        User      `json:"user,omitempty"`
+	Name        string    `json:"name" db:"name"`
+	Description string    `json:"description" db:"description"`
+	CreatedAt   time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
 }
 
 func (p *Product) TableName() string {

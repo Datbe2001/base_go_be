@@ -3,6 +3,7 @@ package initialize
 import (
 	_ "base_go_be/docs"
 	"base_go_be/global"
+
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/zap"
@@ -19,7 +20,7 @@ func Run() {
 	LoadConfig()
 	InitLogger()
 	//global.Logger.Info("check logger", zap.String("key", "value"))
-	Mysql()
+	Postgres()
 	Redis()
 
 	r := InitRouter()

@@ -3,7 +3,9 @@ package repo
 import (
 	"base_go_be/global"
 	"base_go_be/internal/model"
-	"gorm.io/gorm"
+	"context"
+
+	"github.com/jackc/pgxpool/v5"
 )
 
 type IUserRepository interface {
@@ -14,32 +16,62 @@ type IUserRepository interface {
 }
 
 func NewUserRepository() IUserRepository {
-	return &userRepository{db: global.Mysql}
+	return &userRepository{db: global.Postgres}
 }
 
 type userRepository struct {
-	db *gorm.DB
+	db *pgxpool.Pool
 }
 
 func (r *userRepository) GetUserByEmail(email string) bool {
-	var user model.User
-	err := r.db.Where("email = ?", email).First(&user).Error
-	return err == nil
+	ctx := context.Background()
+	var count int
+	err := r.db.QueryRow(ctx, "SELECT COUNT(*) FROM users WHERE email = $1", email).Scan(&count)
+	return err == nil && count > 0
 }
 
 func (r *userRepository) GetUserByID(id uint) *model.User {
+	ctx := context.Background()
 	var user model.User
-	_ = r.db.First(&user, id)
+	err := r.db.QueryRow(ctx,
+		"SELECT id, username, email, is_active, role, created_at FROM users WHERE id = $1",
+		id).Scan(&user.ID, &user.Username, &user.Email, &user.IsActive, &user.Role, &user.CreatedAt)
+
+	if err != nil {
+		return nil
+	}
 	return &user
 }
 
 func (r *userRepository) GetListUser() []*model.User {
+	ctx := context.Background()
+	rows, err := r.db.Query(ctx, "SELECT id, username, email, is_active, role, created_at FROM users")
+	if err != nil {
+		return nil
+	}
+	defer rows.Close()
+
 	var users []*model.User
-	r.db.Find(&users)
+	for rows.Next() {
+		var user model.User
+		err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.IsActive, &user.Role, &user.CreatedAt)
+		if err != nil {
+			continue
+		}
+		users = append(users, &user)
+	}
 	return users
 }
 
 func (r *userRepository) CreateUser(user *model.User) (int, error) {
-	err := r.db.Create(user).Error
-	return int(user.ID), err
+	ctx := context.Background()
+	var id int
+	err := r.db.QueryRow(ctx,
+		"INSERT INTO users (username, email, is_active, role) VALUES ($1, $2, $3, $4) RETURNING id",
+		user.Username, user.Email, user.IsActive, user.Role).Scan(&id)
+
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
 }

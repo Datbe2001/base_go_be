@@ -1,16 +1,14 @@
 package model
 
-import (
-	"time"
-)
+import "time"
 
 type User struct {
-	ID        uint      `gorm:"primaryKey;autoIncrement"`
-	Username  string    `gorm:"type:varchar(255);not null"`
-	Email     string    `gorm:"type:varchar(255);unique;not null"`
-	IsActive  bool      `gorm:"not null;default:true"`
-	Role      string    `gorm:"type:enum('ADMIN', 'USER');not null"`
-	CreatedAt time.Time `gorm:"autoCreateTime"`
+	ID        uint      `json:"id" db:"id"`
+	Username  string    `json:"username" db:"username"`
+	Email     string    `json:"email" db:"email"`
+	IsActive  bool      `json:"is_active" db:"is_active"`
+	Role      string    `json:"role" db:"role"`
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
 }
 
 func (u *User) TableName() string {
